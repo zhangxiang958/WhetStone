@@ -33,7 +33,7 @@ class Set {
 
     forEach(callback, thisArg = global) {
         for (let i = 0; i < this.size; i++) {
-            // value 与 key 相同
+            // value 与 key 相同 
             callback.call(thisArg, this._set[i], this._set[i], this._set);
         }
     }
