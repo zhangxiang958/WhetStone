@@ -1,6 +1,12 @@
 const curry = (func) => {
-    return () => {
-        
+    let allArgs = [];
+    return function callback (...args) {
+        allArgs = allArgs.concat(args);
+        if (allArgs.length < func.length) {
+            return callback;
+        } else {
+            return func.apply(null, allArgs);
+        }
     }
 };
 
