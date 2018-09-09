@@ -22,8 +22,14 @@ In the case of saving the scroll position on the server, you wouldn't want it to
 until after the user is done scrolling, so you would use the debounce function.
  */
 
-const debounce = () => {
-
+const debounce = (func, delay) => {
+    let timer = void 0;
+    return () => {
+        if (timer) {
+            clearTimeout(timer);
+        }
+        timer = setTimeout(func, delay);
+    };
 };
 
 var sayHi = function() {
