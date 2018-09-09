@@ -9,13 +9,13 @@ class Middleware {
     }
 
     go(final) {
-        for (let index = this._queue.length - 1; index >= 1; index--) {
-            let mw = this._queue[index];
-            if (index == this._queue.length - 1) {
-                this._queue[index] = mw.bind(this, final);
-            } else {
-                this._queue[index - 1] = this._queue[index - 1].bind(this, mw);
-            }
+        let index = this._queue.length - 1;
+        let mw = void 0;
+        while (mw = this._queue[index]) {
+            let next = this._queue[index + 1];
+            if (!next) next = final;
+            this._queue[index] = mw.bind(null, next);
+            index --;
         }
         this._queue[0]();
     }
