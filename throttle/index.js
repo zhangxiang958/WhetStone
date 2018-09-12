@@ -1,15 +1,16 @@
 const throttle = (func, delay = 0) => {
     let excuted = void 0;
-    let timer = void 0;
     return () => {
-        let now = +new Date();
-        if (!timer) {
-            timer = setTimeout(func, 0);
-            excuted = now;
+        if (!excuted) {
+            setTimeout(func, 0);
+            excuted = +new Date();
         } else {
-            if (now - excuted >= delay) {
-                timer = setTimeout(func, 0);
-                excuted = now;
+            if (+new Date() - excuted > delay) {
+                setTimeout(func, 0);
+            } else {
+                clearTimeout(func.timer);
+                func.timer = setTimeout(func, 0);
+                excuted = +new Date();
             }
         }
     };
