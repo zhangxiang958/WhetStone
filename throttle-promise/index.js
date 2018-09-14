@@ -19,6 +19,8 @@ const throttlePromises = (concurrency, ...queue) => {
                     results[funcIndex] = res;
                     running --;
                     next();
+                }).catch((err) => {
+                    reject(err);
                 });
             }
         };
