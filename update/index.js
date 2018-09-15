@@ -15,8 +15,13 @@
  * 
  * extend 用于拓展指令
  */
-const $set = (state, paths, value) => {
-    
+const $set = (state, paths = [], value) => {
+    let target = state;
+    let last = paths.length - 1;
+    for (let index = 0; index < last; index ++) {
+        target = state[ paths[index] ];
+    }
+    target[last] = value;
 };
 
 const update = (state, pattern) => {
