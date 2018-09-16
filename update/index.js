@@ -23,6 +23,32 @@ const $set = (state, paths = [], value) => {
     }
     target[last] = value;
 };
+const COMMAND = ['$set', '$unset', '$push'];
+const OPERATION = { $set };
+
+const buildPathsAndValue = (key, pattern) => {
+    let paths = [key];
+    let value = void 0;
+    let type = void 0;
+    let keys = Object.keys(pattern);
+    for (let command of keys) {
+        if (COMMAND.includes(command)) {
+            value = pattern[command];
+            type = command;
+        } else {
+            console.log(command, pattern[command]);
+            let result = buildPathsAndValue(command, pattern[command]);
+            paths = paths.concat(result.paths);
+            value = result.value;
+        }
+    }
+
+    return {
+        paths,
+        value,
+        type
+    };
+};
 
 const update = (state, pattern) => {
     let needUpdate = Object.keys(pattern);
@@ -32,9 +58,8 @@ const update = (state, pattern) => {
         if (!needUpdate.includes(key)) {
             nextState[key] = state[key];
         } else {
-            let updateOperation = pattern[key];
-            let $set = updateOperation['$set'];
-            nextState[key] = $set;
+            let { paths, value, type } = buildPathsAndValue(key, pattern[key]);
+            OPERATION[type](nextState, paths, value);
         }
     }
     return nextState;
