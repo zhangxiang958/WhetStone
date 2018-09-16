@@ -23,9 +23,28 @@ const Util = {
         let last = paths.length - 1;
         for (let index = 0; index < last; index ++) {
             let key = paths[index];
-            if (index < last - 1) target[key] = pointer[key];
-            else target[key] = { ...pointer[key] };
+            if (index == last - 1) {
+                console.log(key);
+                console.log(pointer[key]);
+                console.log(target[key]);
+                console.log(typeof pointer[key]);
+                target[key] = {};
+                let keys = Object.keys(pointer[key]);
+                console.log(keys);
+                for (let k of keys) {
+                    console.log(k);
+                    target[key][k] = pointer[key][k];
+                }
+                // target[key] = Object.assign({}, pointer[key]);
+                // target[key] = { ...pointer[key] };
+                console.log(target[key] === pointer[key]);
+            } else {
+                target[key] = pointer[key];
+            }
+            target = target[key];
+            pointer = pointer[key];
         }
+
         return {
             target,
             key: paths[last]
