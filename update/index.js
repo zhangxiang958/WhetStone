@@ -15,16 +15,76 @@
  * 
  * extend 用于拓展指令
  */
-const $set = (state, paths = [], value) => {
-    let target = state;
-    let last = paths.length - 1;
-    for (let index = 0; index < last; index ++) {
-        target = state[ paths[index] ];
+
+const Util = {
+    findTarget({ thisState, nextState, paths = [] }) {
+        let pointer = thisState;
+        let target = nextState;
+        let last = paths.length - 1;
+        for (let index = 0; index < last; index ++) {
+            let key = paths[index];
+            if (index < last - 1) target[key] = pointer[key];
+            else target[key] = { ...pointer[key] };
+        }
+        return {
+            target,
+            key: paths[last]
+        }
     }
-    target[last] = value;
 };
-const COMMAND = ['$set', '$unset', '$push'];
-const OPERATION = { $set };
+
+const $set = ({thisState, nextState, paths = [], value}) => {
+    let { target, key } = Util.findTarget({ thisState, nextState, paths });
+    console.log('target', target);
+    console.log('thisState', thisState);
+    target[key] = value;
+};
+
+const $unset = ({ thisState, nextState, paths = [], value = [] }) => {
+    let { target, key } = Util.findTarget({ thisState, nextState, paths });
+    let result = {};
+    for (let thisStateKey of Object.keys(thisState[key])) {
+        if (value.includes(thisStateKey)) {
+            continue;
+        }
+        result[thisStateKey] = thisState[key][thisStateKey];
+    }
+    target[key] = result;
+};
+
+const $push = ({thisState, nextState, paths = [], value}) => {
+    let { target, key } = Util.findTarget({ thisState, nextState, paths });
+    target[key] = thisState[key].concat(value);
+};
+
+const $unshift = ({ thisState, nextState, paths = [], value }) => {
+    let { target, key } = Util.findTarget({ thisState, nextState, paths });
+    target[key] = value.concat(thisState[key]);
+};
+
+const $splice = ({ thisState, nextState, paths = [], value }) => {
+    let { target, key } = Util.findTarget({ thisState, nextState, paths });
+    target[key] = thisState
+};
+
+const $merge = ({ thisState, nextState, paths = [], value }) => {
+
+};
+
+const $apply = ({ thisState, nextState, paths = [], value }) => {
+
+};
+
+const $add = ({ thisState, nextState, paths = [], value }) => {
+
+};
+
+const $remove = ({ thisState, nextState, paths = [], value }) => {
+
+};
+
+const OPERATION = { $set, $unset, $push, $unshift, $splice, $merge, $apply, $add, $remove };
+const COMMAND = Object.keys(OPERATION);
 
 const buildPathsAndValue = (key, pattern) => {
     let paths = [key];
@@ -35,11 +95,11 @@ const buildPathsAndValue = (key, pattern) => {
         if (COMMAND.includes(command)) {
             value = pattern[command];
             type = command;
+            break;
         } else {
-            console.log(command, pattern[command]);
             let result = buildPathsAndValue(command, pattern[command]);
             paths = paths.concat(result.paths);
-            value = result.value;
+            ({ value, type } = result);
         }
     }
 
@@ -59,14 +119,49 @@ const update = (state, pattern) => {
             nextState[key] = state[key];
         } else {
             let { paths, value, type } = buildPathsAndValue(key, pattern[key]);
-            OPERATION[type](nextState, paths, value);
+            OPERATION[type]({thisState: state, nextState, paths, value});
         }
     }
     return nextState;
 };
 
-var state = { name: 'Alice', todos: [] };
+var state = { 
+    name: 'Alice',
+    todos: [],
+    testArr: ['fuck'],
+    arr: ['fuck'],
+    testUnset: {
+        name: 'zhang',
+        sex: 'man',
+        age: 23
+    },
+    deep: {
+        a: {
+            b: {
+                c: {
+                    val: 1
+                }
+            }
+        }
+    }
+};
 var nextState = update(state, {
-    name: {$set: 'Bob'}
+    // name: {$set: 'Bob'},
+    testArr: {$push: ['you']},
+    arr: {$unshift: ['what', 'the']},
+    testUnset: {$unset: ['name', 'sex']},
+    deep: {
+        a: {
+            b: {
+                c: {
+                    val: {
+                        $set: 2
+                    }
+                }
+            }
+        }
+    }
 });
 console.log(state.todos === nextState.todos); // true
+console.log(JSON.stringify(state));
+console.log(JSON.stringify(nextState));
