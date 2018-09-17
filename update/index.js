@@ -35,8 +35,8 @@ const Util = {
                     console.log(k);
                     target[key][k] = pointer[key][k];
                 }
-                // target[key] = Object.assign({}, pointer[key]);
-                // target[key] = { ...pointer[key] };
+                target[key] = Object.assign({}, pointer[key]);
+                target[key] = { ...pointer[key] };
                 console.log(target[key] === pointer[key]);
             } else {
                 target[key] = pointer[key];
