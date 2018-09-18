@@ -23,24 +23,8 @@ const Util = {
         let last = paths.length - 1;
         for (let index = 0; index < last; index ++) {
             let key = paths[index];
-            if (index == last - 1) {
-                console.log(key);
-                console.log(pointer[key]);
-                console.log(target[key]);
-                console.log(typeof pointer[key]);
-                target[key] = {};
-                let keys = Object.keys(pointer[key]);
-                console.log(keys);
-                for (let k of keys) {
-                    console.log(k);
-                    target[key][k] = pointer[key][k];
-                }
-                target[key] = Object.assign({}, pointer[key]);
-                target[key] = { ...pointer[key] };
-                console.log(target[key] === pointer[key]);
-            } else {
-                target[key] = pointer[key];
-            }
+            target[key] = Object.assign({}, pointer[key]);
+            // 递归地往下查找
             target = target[key];
             pointer = pointer[key];
         }
@@ -54,8 +38,7 @@ const Util = {
 
 const $set = ({thisState, nextState, paths = [], value}) => {
     let { target, key } = Util.findTarget({ thisState, nextState, paths });
-    console.log('target', target);
-    console.log('thisState', thisState);
+    console.log('b', thisState.deep.b === nextState.deep.b);
     target[key] = value;
 };
 
