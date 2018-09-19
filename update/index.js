@@ -38,7 +38,6 @@ const Util = {
 
 const $set = ({thisState, nextState, paths = [], value}) => {
     let { target, key } = Util.findTarget({ thisState, nextState, paths });
-    console.log('b', thisState.deep.b === nextState.deep.b);
     target[key] = value;
 };
 
@@ -143,12 +142,13 @@ var state = {
                 c: {
                     val: 1
                 }
-            }
+            },
+            b2: []
         }
     }
 };
 var nextState = update(state, {
-    // name: {$set: 'Bob'},
+    name: {$set: 'Bob'},
     testArr: {$push: ['you']},
     arr: {$unshift: ['what', 'the']},
     testUnset: {$unset: ['name', 'sex']},
@@ -165,5 +165,6 @@ var nextState = update(state, {
     }
 });
 console.log(state.todos === nextState.todos); // true
+console.log(state.deep.a.b2 === nextState.deep.a.b2);
 console.log(JSON.stringify(state));
 console.log(JSON.stringify(nextState));
