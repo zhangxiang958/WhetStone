@@ -31,6 +31,7 @@ const Util = {
 
         return {
             target,
+            origin: pointer,
             key: paths[last]
         }
     }
@@ -54,30 +55,40 @@ const $unset = ({ thisState, nextState, paths = [], value = [] }) => {
 };
 
 const $push = ({thisState, nextState, paths = [], value}) => {
-    let { target, key } = Util.findTarget({ thisState, nextState, paths });
-    target[key] = thisState[key].concat(value);
+    let { target, origin, key } = Util.findTarget({ thisState, nextState, paths });
+    target[key] = origin[key].concat(value);
 };
 
 const $unshift = ({ thisState, nextState, paths = [], value }) => {
-    let { target, key } = Util.findTarget({ thisState, nextState, paths });
-    target[key] = value.concat(thisState[key]);
+    let { target, origin, key } = Util.findTarget({ thisState, nextState, paths });
+    target[key] = value.concat(origin[key]);
 };
 
 const $splice = ({ thisState, nextState, paths = [], value }) => {
-    let { target, key } = Util.findTarget({ thisState, nextState, paths });
-    target[key] = thisState
+    let { target, origin, key } = Util.findTarget({ thisState, nextState, paths });
+    target[key] = origin[key].slice(0);
+    for (let arg of value) {
+        Array.prototype.splice.apply(target[key], arg);
+    }
 };
 
 const $merge = ({ thisState, nextState, paths = [], value }) => {
-
+    let { target, origin, key } = Util.findTarget({ thisState, nextState, paths });
+    target[key] = Object.assign({}, origin[key], value);
 };
 
 const $apply = ({ thisState, nextState, paths = [], value }) => {
-
+    let { target, key } = Util.findTarget({ thisState, nextState, paths });
+    if (typeof value !== 'function') throw new Error('$apply value must be a function');
+    target[key] = value();
 };
 
 const $add = ({ thisState, nextState, paths = [], value }) => {
-
+    let { target, key } = Util.findTarget({ thisState, nextState, paths });
+    if (!(target[key] instanceof Map) || !(target[key] instanceof Set)) throw new Error('$add must excute for Map of Set');
+    for (let [key, val] of value) {
+        
+    }
 };
 
 const $remove = ({ thisState, nextState, paths = [], value }) => {
