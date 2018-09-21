@@ -84,15 +84,35 @@ const $apply = ({ thisState, nextState, paths = [], value }) => {
 };
 
 const $add = ({ thisState, nextState, paths = [], value }) => {
-    let { target, key } = Util.findTarget({ thisState, nextState, paths });
-    if (!(target[key] instanceof Map) || !(target[key] instanceof Set)) throw new Error('$add must excute for Map of Set');
-    for (let [key, val] of value) {
-        
+    let { target, origin, key } = Util.findTarget({ thisState, nextState, paths });
+    if (!(origin[key] instanceof Map) || !(origin[key] instanceof Set)) throw new Error('$add must excute for Map of Set');
+    if (origin[key] instanceof Map) {
+        target[key] = new Map(origin[key]);
+        for (let  of value) {
+            target[key].set(mapKey, val);
+        }
+    } else {
+        target[key] = new Set(origin[key]);
+        for (let [setKey] of value) {
+            target[key].set(setKey);
+        }
     }
 };
 
-const $remove = ({ thisState, nextState, paths = [], value }) => {
-
+const $remove = ({ thisState, nextState, paths = [], value = [] }) => {
+    let { target, origin, key } = Util.findTarget({ thisState, nextState, paths });
+    if (!(origin[key] instanceof Map) || !(origin[key] instanceof Set)) throw new Error('$add must excute for Map of Set');
+    if (origin[key] instanceof Map) {
+        target[key] = new Map(origin[key]);
+        for (let delKey of value) {
+            target[key].delete(delKey);
+        }
+    } else {
+        target[key] = new Set(origin[key]);
+        for (let delKey of value) {
+            target[key].delete(delKey);
+        }
+    }
 };
 
 const OPERATION = { $set, $unset, $push, $unshift, $splice, $merge, $apply, $add, $remove };
