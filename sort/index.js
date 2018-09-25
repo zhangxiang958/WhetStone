@@ -1,3 +1,11 @@
+/**
+ * quick sort
+ * babel sort
+ * select sort
+ * heap sort
+ * @param {*} arr 
+ */
+
 const sort = (arr) => {
     if (!Array.isArray(arr)) throw new Error('sort arguments must be a array.');
     for (let index = 0, length = arr.length; index < length; index++) {

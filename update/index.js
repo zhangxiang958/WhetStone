@@ -88,7 +88,7 @@ const $add = ({ thisState, nextState, paths = [], value }) => {
     if (!(origin[key] instanceof Map) || !(origin[key] instanceof Set)) throw new Error('$add must excute for Map of Set');
     if (origin[key] instanceof Map) {
         target[key] = new Map(origin[key]);
-        for (let  of value) {
+        for (let mapKey of value) {
             target[key].set(mapKey, val);
         }
     } else {
@@ -199,3 +199,5 @@ console.log(state.todos === nextState.todos); // true
 console.log(state.deep.a.b2 === nextState.deep.a.b2);
 console.log(JSON.stringify(state));
 console.log(JSON.stringify(nextState));
+
+module.exports = update;
