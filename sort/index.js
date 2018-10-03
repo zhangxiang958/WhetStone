@@ -6,7 +6,7 @@
  * @param {*} arr 
  */
 
-const sort = (arr) => {
+const sort = (arr, type = 'quickSort') => {
     if (!Array.isArray(arr)) throw new Error('sort arguments must be a array.');
     for (let index = 0, length = arr.length; index < length; index++) {
         let item = arr[index];
