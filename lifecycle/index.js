@@ -1,0 +1,1 @@
+console.log(String.raw`Hi\n${2+3}!`);
