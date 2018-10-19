@@ -2,9 +2,10 @@ const once = function (func) {
     let result;
     let already = false;
     return function () {
+        let args = [].slice.call(arguments, 0);
         if (!already) {
             already = true;
-            result = func();
+            result = func.apply(this, args);
             return result;
         } else {
             return result;
