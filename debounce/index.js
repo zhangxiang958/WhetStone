@@ -24,11 +24,14 @@ until after the user is done scrolling, so you would use the debounce function.
 
 const debounce = (func, delay) => {
     let timer = void 0;
-    return () => {
+    return function (){
+        let args = [].slice.call(arguments, 0);
         if (timer) {
             clearTimeout(timer);
         }
-        timer = setTimeout(func, delay);
+        timer = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
     };
 };
 
