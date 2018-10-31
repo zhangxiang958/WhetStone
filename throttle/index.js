@@ -1,11 +1,8 @@
 const throttle = (func, delay = 0) => {
-    // let already = false;
-    // let excuted = +new Date();
     let excuted = void 0;
     return function(...args) {
-        if (!excuted) {
+        if (excuted === void 0) {
             func.apply(this, args);
-            // already = true;
             excuted = +new Date();
         } else {
             let now = +new Date();
