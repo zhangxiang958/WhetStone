@@ -51,3 +51,5 @@ throttlePromises(5, arr).then(function(results) {
     console.log(results);
     console.log('only 5 promises were ever executing in parallel');
 });
+
+module.exports = throttlePromises;
