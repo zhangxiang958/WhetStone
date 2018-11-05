@@ -1,8 +1,8 @@
-const map = (arr, func) => {
+const map = function (arr, func, thisArg) {
     if (Object.prototype.toString.call(arr) !== '[object Array]') throw new Error('arr must be a Array');
     let result = [];
     for(let i = 0; i < arr.length; i++) {
-        result[i] = func.call(null, arr[i], i, arr);
+        result[i] = func.call(thisArg || this, arr[i], i, arr);
     }
     return result;
 };
