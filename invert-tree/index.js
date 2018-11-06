@@ -1,5 +1,8 @@
 const invertTree = function (root) {
-    
+    let left = root.left;
+    let right = root.right;
+    root.left = right;
+    root.right = left;
 };
 
 var root = {value: 6};
