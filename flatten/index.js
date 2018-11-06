@@ -2,7 +2,7 @@ const isArray = (arg) => {
     return Object.prototype.toString.call(arg) === '[object Array]';
 };
 
-const flatten = (arr, depth = 1) => {
+const flatten = (arr, depth) => {
     if (!isArray(arr)) throw new Error('argument must be a Array');
     let result = [];
     for (let i = 0, length = arr.length; i < length; i ++) {
@@ -12,7 +12,7 @@ const flatten = (arr, depth = 1) => {
             if (!isArray(arr[i])) {
                 result.push(arr[i]);
             } else {
-                result = result.concat(flatten(arr[i], --depth));
+                result = result.concat(flatten(arr[i], depth !== void 0 ? depth - 1 : depth));
             }
         }
         
@@ -22,6 +22,6 @@ const flatten = (arr, depth = 1) => {
 
 var arr = [1, [2], [3, 4, [5]]];
 
-console.log(flatten(arr, 2)); 
+console.log(flatten(arr, 1)); 
 
 module.exports = flatten;
