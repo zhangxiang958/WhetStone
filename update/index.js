@@ -39,6 +39,11 @@ const Util = {
 
 const $set = ({thisState, nextState, paths = [], value}) => {
     let { target, key } = Util.findTarget({ thisState, nextState, paths });
+    if (!key) {
+        Object.assign(target, value);
+        return;
+    }
+    console.log(target, key, value);
     target[key] = value;
 };
 
@@ -55,16 +60,33 @@ const $unset = ({ thisState, nextState, paths = [], value = [] }) => {
 };
 
 const $push = ({thisState, nextState, paths = [], value}) => {
+    if (Object.prototype.toString.call(thisState) == '[object Array]') {
+        thisState.forEach(v => nextState.push(v));
+        value.forEach(v => nextState.push(v));
+        return;
+    }
     let { target, origin, key } = Util.findTarget({ thisState, nextState, paths });
     target[key] = origin[key].concat(value);
 };
 
 const $unshift = ({ thisState, nextState, paths = [], value }) => {
+    if (Object.prototype.toString.call(thisState) == '[object Array]') {
+        thisState.forEach(v => nextState.push(v));
+        value.forEach(v => nextState.unshift(v));
+        return;
+    }
     let { target, origin, key } = Util.findTarget({ thisState, nextState, paths });
     target[key] = value.concat(origin[key]);
 };
 
 const $splice = ({ thisState, nextState, paths = [], value }) => {
+    if (Object.prototype.toString.call(thisState) == '[object Array]') {
+        thisState.forEach(v => nextState.push(v));
+        for (let arg of value) {
+            Array.prototype.splice.apply(nextState, arg);
+        }
+        return;
+    }
     let { target, origin, key } = Util.findTarget({ thisState, nextState, paths });
     target[key] = origin[key].slice(0);
     for (let arg of value) {
@@ -74,12 +96,19 @@ const $splice = ({ thisState, nextState, paths = [], value }) => {
 
 const $merge = ({ thisState, nextState, paths = [], value }) => {
     let { target, origin, key } = Util.findTarget({ thisState, nextState, paths });
+    if (!key) {
+        Object.assign(target, origin, value);
+        return;
+    }
     target[key] = Object.assign({}, origin[key], value);
 };
 
 const $apply = ({ thisState, nextState, paths = [], value }) => {
     let { target, key } = Util.findTarget({ thisState, nextState, paths });
     if (typeof value !== 'function') throw new Error('$apply value must be a function');
+    if (!key) {
+        return value(thisState);
+    }
     target[key] = value();
 };
 
@@ -143,17 +172,36 @@ const buildPathsAndValue = (key, pattern) => {
 };
 
 const update = (state, pattern) => {
-    let needUpdate = Object.keys(pattern);
-    let allKeys = Object.keys(state);
-    let nextState = {};
-    for (let key of allKeys) {
-        if (!needUpdate.includes(key)) {
-            nextState[key] = state[key];
-        } else {
-            let { paths, value, type } = buildPathsAndValue(key, pattern[key]);
-            OPERATION[type]({thisState: state, nextState, paths, value});
+    let nextState;
+    if (Object.prototype.toString.call(state) == '[object Object]') {
+        let needUpdate = Object.keys(pattern);
+        let allKeys = Object.keys(state);
+        nextState = {};
+        for (let key of allKeys) {
+            if (!needUpdate.includes(key)) {
+                if (needUpdate.find(key => COMMAND.includes(key))) {
+                    let command = needUpdate[0];
+                    OPERATION[command]({ thisState: state, nextState, paths: [], value: pattern[command] });
+                } else {
+                    nextState[key] = state[key];
+                }
+            } else {
+                let { paths, value, type } = buildPathsAndValue(key, pattern[key]);
+                OPERATION[type]({thisState: state, nextState, paths, value});
+            }
         }
+    } else if (Object.prototype.toString.call(state) == '[object Array]') {
+        nextState = [];
+        let operations = Object.keys(pattern);
+        for (let operation of operations) {
+            let paths = [];
+            OPERATION[operation]({ thisState: state, nextState, paths, value: pattern[operation] });
+        }
+    } else {
+        let command = Object.keys(pattern)[0];
+        nextState = OPERATION[command]({ thisState: state, nextState, paths: [], value: pattern[command] });
     }
+    
     return nextState;
 };
 
@@ -178,26 +226,28 @@ var state = {
         }
     }
 };
-var nextState = update(state, {
-    name: {$set: 'Bob'},
-    testArr: {$push: ['you']},
-    arr: {$unshift: ['what', 'the']},
-    testUnset: {$unset: ['name', 'sex']},
-    deep: {
-        a: {
-            b: {
-                c: {
-                    val: {
-                        $set: 2
-                    }
-                }
-            }
-        }
-    }
-});
-console.log(state.todos === nextState.todos); // true
-console.log(state.deep.a.b2 === nextState.deep.a.b2);
-console.log(JSON.stringify(state));
-console.log(JSON.stringify(nextState));
+// var nextState = update(state, {
+//     name: {$set: 'Bob'},
+//     testArr: {$push: ['you']},
+//     arr: {$unshift: ['what', 'the']},
+//     testUnset: {$unset: ['name', 'sex']},
+//     deep: {
+//         a: {
+//             b: {
+//                 c: {
+//                     val: {
+//                         $set: 2
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// });
+let test = update([1], {$push: [7]});
+console.log('test', test);
+// console.log(state.todos === nextState.todos); // true
+// console.log(state.deep.a.b2 === nextState.deep.a.b2);
+// console.log(JSON.stringify(state));
+// console.log(JSON.stringify(nextState));
 
 module.exports = update;
