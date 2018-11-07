@@ -43,7 +43,6 @@ const $set = ({thisState, nextState, paths = [], value}) => {
         Object.assign(target, value);
         return;
     }
-    console.log(target, key, value);
     target[key] = value;
 };
 
@@ -177,6 +176,7 @@ const update = (state, pattern) => {
         let needUpdate = Object.keys(pattern);
         let allKeys = Object.keys(state);
         nextState = {};
+        if (allKeys.length == 0) allKeys = needUpdate.slice(0);
         for (let key of allKeys) {
             if (!needUpdate.includes(key)) {
                 if (needUpdate.find(key => COMMAND.includes(key))) {
