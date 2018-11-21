@@ -1,4 +1,4 @@
-/**
+/**persistent data structures js
  * update
  * @param {*} state 
  * @param {*} pattern 
@@ -204,6 +204,20 @@ const update = (state, pattern) => {
     
     return nextState;
 };
+
+// const update = function (state, pattern) {
+//     for (let prop in pattern) {
+//         if (Object.prototype.hasOwnProperty.call(state, prop)) {
+//             update(state[prop], pattern[prop]);
+//         } else {
+//             if (COMMAND.includes(prop)) {
+                
+//             } else {
+
+//             }
+//         }
+//     }
+// };
 
 var state = { 
     name: 'Alice',
