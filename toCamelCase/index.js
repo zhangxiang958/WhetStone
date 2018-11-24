@@ -8,8 +8,11 @@ const toCamelCase = function (str) {
     if (typeof str !== 'string') {
         throw new Error('str onlt accept string.');
     }
-    let regx = /\s/;
-    return str.replace(regx, '');
+    let regx = /(\w)(\_)(\w)/gs;
+    return str.replace(regx, (...args) => {
+        let [ matched, first, underline, second ] = args;
+        return `${first}${second.toUpperCase()}`;
+    });
 };
 
 console.log(toCamelCase('is_good'));
