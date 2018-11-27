@@ -22,4 +22,8 @@ const initArray = function (m, n) {
     return new Array(m).fill(n);
 }
 
+const initArray = function (m) {
+    return [...Array(m).keys()];
+}
+
 initArray(10, 10);
