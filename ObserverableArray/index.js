@@ -14,9 +14,24 @@
  * 注意，你不能修改 Array 的 prototype。还有函数 return 的值和原生的操作保持一致。
  */
 
-class ObserverableArray {
-    
+class ObserverableArray extends Array {
+    constructor (...args) {
+        super(...args);
+    }
+
+    push(...args) {
+        let result = super.push.apply(this, args);
+        console.log('push, 数据变成了 ', this);
+        return result;
+    }
+
+    pop(...args) {
+        let result = super.push.apply(this, args);
+        console.log('pop, 数据变成了 ', this);
+        return result;
+    }
 }
 
 const arr = new ObserverableArray();
 arr.push('Good'); // ['Good']
+console.log(arr);
