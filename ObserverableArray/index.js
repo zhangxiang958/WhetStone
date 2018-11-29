@@ -17,40 +17,17 @@
 class ObserverableArray extends Array {
     constructor (...args) {
         super(...args);
-    }
-
-    callOperation(method, args) {
-        let result = super[method].apply(this, args);
-        console.log(`${method}, 数据变成了 `, this);
-        return result;
-    }
-
-    push(...args) {
-        return this.callOperation('push', args);
-    }
-
-    pop(...args) {
-        return this.callOperation('pop', args);
-    }
-
-    shift(...args) {
-        return this.callOperation('shift', args);
-    }
-
-    unshift(...args) {
-        return this.callOperation('unshift', args);
-    }
-
-    splice(...args) {
-        return this.callOperation('splice', args);
-    }
-
-    sort(...args) {
-        return this.callOperation('sort', args);
-    }
-
-    reverse() {
-        return this.callOperation('reverse', args);
+        let observerMethods = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse'];
+        let observerProto = [];
+        observerMethods.forEach((method) => {
+            let origin = Array.prototype;
+            observerProto[method] = function (...args) {
+                let result = origin[method].apply(this, args);
+                console.log(`${method}, 数据变成了 `, this);
+                return result;
+            };
+        });
+        this.__proto__ = observerProto;
     }
 }
 
