@@ -19,16 +19,38 @@ class ObserverableArray extends Array {
         super(...args);
     }
 
-    push(...args) {
-        let result = super.push.apply(this, args);
-        console.log('push, 数据变成了 ', this);
+    callOperation(method, args) {
+        let result = super[method].apply(this, args);
+        console.log(`${method}, 数据变成了 `, this);
         return result;
     }
 
+    push(...args) {
+        return this.callOperation('push', args);
+    }
+
     pop(...args) {
-        let result = super.push.apply(this, args);
-        console.log('pop, 数据变成了 ', this);
-        return result;
+        return this.callOperation('pop', args);
+    }
+
+    shift(...args) {
+        return this.callOperation('shift', args);
+    }
+
+    unshift(...args) {
+        return this.callOperation('unshift', args);
+    }
+
+    splice(...args) {
+        return this.callOperation('splice', args);
+    }
+
+    sort(...args) {
+        return this.callOperation('sort', args);
+    }
+
+    reverse() {
+        return this.callOperation('reverse', args);
     }
 }
 
