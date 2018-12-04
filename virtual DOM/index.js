@@ -35,19 +35,38 @@
  */
 
 class VNode {
-    constructor({ tagName, props, children }) {
+    constructor({ tagName, props = {}, children = [] }) {
         this.tagName = tagName;
         this.props = props;
-        this.children = children;
+        this.children = children.filter(ele => {
+            return typeof ele === 'string' || typeof ele === 'object';
+        });
     }
 
+    getTemplate() {
+        let props = Object.keys(this.props).map(prop => {
+            let val = this.props[prop];
+            return `${prop}='${val}'`;
+        });
+        let children = this.children.map(ele => {
+            if (ele instanceof VNode) {
+                return ele.getTemplate();
+            } else {
+                return ele;
+            }
+        });
+        let template = `<${this.tagName} ${props.join(' ')}>\n${children.join('\n')}\n</${this.tagName}>`;
+        return template;
+    }
+    
     render() {
+        console.log(this.getTemplate());
         
     }
 }
 
-const h = function () {
-
+const h = function (tagName, props, children) {
+    return new VNode({ tagName, props, children });
 };
 
 
@@ -58,5 +77,6 @@ const ul = h('ul', {id: 'list', style: 'color: red'}, [
     h('li', {class: 'item'}, ['Item 3'])
 ]);
 
-ul.props.id === 'list' // => true
-ul instanceof VNode // => true
+console.log(ul.props.id === 'list'); // => true
+console.log(ul instanceof VNode); // => true
+ul.render();
