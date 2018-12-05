@@ -29,7 +29,7 @@
         h('li', {class: 'item'}, ['Item 3'])
     ]);
 
-    const urlDom = ul.render() // 渲染 DOM 节点和它的子节点
+    const ulDom = ul.render() // 渲染 DOM 节点和它的子节点
     ulDom.getAttribute('id') === 'list' // true
     ulDom.querySelectorAll('li').length === 3 // true
  */
@@ -61,7 +61,9 @@ class VNode {
     
     render() {
         console.log(this.getTemplate());
-        
+        let container = document.createElement('div');
+        container.innerHTML = this.getTemplate();
+        return container.children[0];
     }
 }
 
@@ -79,4 +81,6 @@ const ul = h('ul', {id: 'list', style: 'color: red'}, [
 
 console.log(ul.props.id === 'list'); // => true
 console.log(ul instanceof VNode); // => true
-ul.render();
+const ulDom = ul.render() // 渲染 DOM 节点和它的子节点
+console.log(ulDom.getAttribute('id') === 'list') // true
+console.log(ulDom.querySelectorAll('li').length === 3) // true
