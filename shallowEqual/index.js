@@ -23,14 +23,45 @@
  */
 
 const shallowEqual = function (params, otherParams) {
-    if (Array.isArray(params) && Array.isArray(otherParams)) {
+    if (typeof params !== typeof otherParams) {
+        return false;
+    } else if (Array.isArray(params) && Array.isArray(otherParams)) {
+        if (params.length !== otherParams.length) return false;
         return params.every((i, idx) => {
-            
+            return i === otherParams[idx];
         });
-    }
-    if (typeof params == 'object' && typeof params == 'object') {
-
+    } else if (typeof params == 'object' && typeof otherParams == 'object') {
+        if ((params == null || otherParams == null)) return false;
+        if (Object.keys(params).length !== Object.keys(otherParams).length) return false;
+        let keys = Object.keys(params);
+        let res = true;
+        for (let i = 0, length = keys.length; i < length; i++) {
+            let prop = keys[i];
+            if (params[prop] !== otherParams[prop]) {
+                res = false;
+                break;
+            }
+        }
+        return res;
     } else {
+        if (Number.isNaN(params) && Number.isNaN(otherParams)) return true;
         return params === otherParams;
     }
 };
+
+console.log('1,1',shallowEqual(1, 1)) // true
+console.log('1,2',shallowEqual(1, 2)) // false
+console.log('foo,foo',shallowEqual('foo', 'foo')) // true
+// shallowEqual(window, window) // true
+console.log('foo,bar',shallowEqual('foo', 'bar')) // false
+console.log('[],[]',shallowEqual([], [])) // true
+console.log('[1,2,3],[1,2,3]',shallowEqual([1, 2, 3], [1, 2, 3])) // true
+console.log('{name:jerry},{name:jerry}',shallowEqual({ name: 'Jerry' }, { name: 'Jerry' })) // true
+console.log('{age:NaN},{age:NaN}',shallowEqual({ age: NaN }, { age: NaN })) // true
+console.log('null, {age:NaN}',shallowEqual(null, { age: NaN })) // false
+
+var a = { name: 'Jerry' }
+var b = { age: 12 }
+console.log('{a,b},{a,b}',shallowEqual({ a, b }, { a, b })) // true
+console.log('{name:{a,b}}, {name:{a,b}}',shallowEqual({ name: { a, b } }, { name: { a, b } }));// false
+console.log('{a,b},{a}',shallowEqual({ a, b }, { a })) // false
