@@ -65,6 +65,10 @@ class VNode {
         container.innerHTML = this.getTemplate();
         return container.children[0];
     }
+
+    static update($root, newVNode, oldVNode) {
+        
+    }
 }
 
 const h = function (tagName, props, children) {
