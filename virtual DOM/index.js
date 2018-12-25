@@ -59,11 +59,25 @@ class VNode {
         return template;
     }
     
-    render() {
+    render_performance() {
         console.log(this.getTemplate());
         let container = document.createElement('div');
         container.innerHTML = this.getTemplate();
         return container.children[0];
+    }
+
+    render() {
+        const $el = document.createElement(this.tagName);
+        Object.keys(this.props).forEach((prop) => {
+            $el.setAttribute(prop, this.props[prop]);
+        });
+        this.children
+            .map((child) => {
+                if (typeof child === 'string') return document.createTextNode(child);
+                return child.render();
+            })
+            .forEach($el.appendChild.bind($el));
+        return $el;
     }
 
     static update($root, newVNode, oldVNode) {
