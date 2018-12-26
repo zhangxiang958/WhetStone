@@ -80,8 +80,48 @@ class VNode {
         return $el;
     }
 
-    static update($root, newVNode, oldVNode) {
-        
+    static changed(newNode, oldNode) {
+        if (typeof newNode !== typeof oldNode) {
+            return false;
+        } else if (typeof newNode === 'string') {
+            return newNode !== oldNode;
+        } else {
+            return newNode.tagName !== oldNode.tagName
+        }
+    }
+    /**
+     * 更新虚拟 DOM
+     * @param {*} $root 
+     * @param {*} newVNode instance of VNode
+     * @param {*} oldVNode instance of VNode
+     */
+    static update($root, newVNode, oldVNode, index = 0) {
+        if (!oldVNode) {
+            $root.appendChild(newVNode.render());
+        } else if (!newVNode) {
+            $root.removeChild(
+                $root.childNodes[index] // 这里需要使用 Node 节点数组不能用 children 数组，因为有可能是文本节点
+            );
+        } else if (this.changed(newVNode, oldVNode)){
+            let $newVNode = newVNode instanceof VNode ? newVNode.render() : document.createTextNode(newVNode);
+            console.log(newVNode);
+            console.log(oldVNode);
+            $root.replaceChild(
+                $newVNode,
+                $root.childNodes[index]
+            );
+        } else if (newVNode.tagName) {
+            const newLength = newVNode.children.length;
+            const oldLength = oldVNode.children.length;
+            for (let i = 0; i < newLength || i < oldLength; i++) {
+                this.update(
+                    $root.childNodes[index],
+                    newVNode.children[i],
+                    oldVNode.children[i],
+                    i
+                );
+            }
+        }
     }
 }
 
@@ -97,8 +137,26 @@ const ul = h('ul', {id: 'list', style: 'color: red'}, [
     h('li', {class: 'item'}, ['Item 3'])
 ]);
 
+const ul2 = h('ul', {id: 'list', style: 'color: red'}, [
+    h('li', {class: 'item'}, ['Item 1']),
+    h('li', {class: 'item'}, ['Item 2']),
+    h('li', {class: 'item'}, ['Item ha?'])
+]);
+
+const div = h('div', { id: 'bos', style: 'color: red' }, [
+    h('p', { class: 'p' }, ['hello world'])
+]);
+
+const $root = document.getElementById('root');
+console.log(ul);
 console.log(ul.props.id === 'list'); // => true
 console.log(ul instanceof VNode); // => true
 const ulDom = ul.render() // 渲染 DOM 节点和它的子节点
+$root.appendChild(ulDom);
+
 console.log(ulDom.getAttribute('id') === 'list') // true
 console.log(ulDom.querySelectorAll('li').length === 3) // true
+
+document.getElementById('reload').addEventListener('click', () => {
+    VNode.update($root, ul2, ul);
+});
