@@ -69,6 +69,21 @@ class VNode {
     render() {
         const $el = document.createElement(this.tagName);
         Object.keys(this.props).forEach((prop) => {
+            if (/^on/.test(prop) && typeof this.props[prop] === 'function') { // 说明是一个事件回掉
+                let eventName = prop.slice(2).toLowerCase();
+                $el.addEventListener(eventName, this.props[prop]);
+                return;
+            }
+            if (typeof this.props[prop] === 'boolean') {
+                if (this.props[prop]) {
+                    $el.setAttribute(prop, this.props[prop]);
+                    //  某些属性是布尔类型的，那么要对元素本身的属性名对应的值设置，不能简单 setAttribute
+                    $el[prop] = true;
+                } else {
+                    $el[prop] = false;
+                }
+                return;
+            }
             $el.setAttribute(prop, this.props[prop]);
         });
         this.children
@@ -82,15 +97,48 @@ class VNode {
 
     static changed(newNode, oldNode) {
         if (typeof newNode !== typeof oldNode) {
-            return false;
+            return true;
         } else if (typeof newNode === 'string') {
             return newNode !== oldNode;
         } else {
             return newNode.tagName !== oldNode.tagName
         }
     }
+
     /**
-     * 更新虚拟 DOM
+     * 更新虚拟 DOM 元素的 props 属性
+     */
+    static updateProps($root, newProps, oldProps) {
+        let props = Object.assign({}, newProps, oldProps);
+        Object.keys(props).forEach(prop => {
+            if (/^on/.test(prop) && typeof newProps[prop] === 'function') { // 说明是一个事件回掉
+                if (newProps[prop] !== oldProps[props]) {
+                    let eventName = prop.slice(2).toLowerCase();
+                    $root.addEventListener(eventName, newProps[prop]);
+                    oldProps[prop] && $root.removeEventListener(eventName, oldProps[prop]);
+                    return;
+                }
+            }
+            if (!newProps[prop]) {
+                if (typeof oldProps[prop] === 'boolean') {
+                    $root[prop] = false;
+                }
+                $root.removeAttribute(prop);
+            } else if (!oldProps[prop] || newProps[prop] !== oldProps[prop]) {
+                if (typeof newProps[prop] === 'boolean') {
+                    if (newProps[prop]) {
+                        $root[prop] = true;
+                    } else {
+                        $root[prop] = false;
+                    }
+                }
+                $root.setAttribute(prop, newProps[prop]);
+            }
+        });
+    }
+
+    /**
+     * 更新虚拟 DOM 元素
      * @param {*} $root 
      * @param {*} newVNode instance of VNode
      * @param {*} oldVNode instance of VNode
@@ -104,13 +152,12 @@ class VNode {
             );
         } else if (this.changed(newVNode, oldVNode)){
             let $newVNode = newVNode instanceof VNode ? newVNode.render() : document.createTextNode(newVNode);
-            console.log(newVNode);
-            console.log(oldVNode);
             $root.replaceChild(
                 $newVNode,
                 $root.childNodes[index]
             );
         } else if (newVNode.tagName) {
+            this.updateProps($root.childNodes[index], newVNode.props, oldVNode.props);
             const newLength = newVNode.children.length;
             const oldLength = oldVNode.children.length;
             for (let i = 0; i < newLength || i < oldLength; i++) {
@@ -131,13 +178,13 @@ const h = function (tagName, props, children) {
 
 
 
-const ul = h('ul', {id: 'list', style: 'color: red'}, [
+const ul = h('ul', {id: 'list', style: 'color: red', onClick: () => { console.log('ul') } }, [
     h('li', {class: 'item'}, ['Item 1']),
     h('li', {class: 'item'}, ['Item 2']),
     h('li', {class: 'item'}, ['Item 3'])
 ]);
 
-const ul2 = h('ul', {id: 'list', style: 'color: red'}, [
+const ul2 = h('ul', {id: 'list1', style: 'color: blue', 'data-id': 123, onClick: () => { console.log('ul2') }}, [
     h('li', {class: 'item'}, ['Item 1']),
     h('li', {class: 'item'}, ['Item 2']),
     h('li', {class: 'item'}, ['Item ha?'])
