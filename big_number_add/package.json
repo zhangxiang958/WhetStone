@@ -1,0 +1,14 @@
+{
+  "name": "big_number_add",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "should": "^13.2.3"
+  }
+}

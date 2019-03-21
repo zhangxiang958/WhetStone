@@ -43,28 +43,28 @@ class VNode {
         });
     }
 
-    getTemplate() {
-        let props = Object.keys(this.props).map(prop => {
-            let val = this.props[prop];
-            return `${prop}='${val}'`;
-        });
-        let children = this.children.map(ele => {
-            if (ele instanceof VNode) {
-                return ele.getTemplate();
-            } else {
-                return ele;
-            }
-        });
-        let template = `<${this.tagName} ${props.join(' ')}>\n${children.join('\n')}\n</${this.tagName}>`;
-        return template;
-    }
+    // getTemplate() {
+    //     let props = Object.keys(this.props).map(prop => {
+    //         let val = this.props[prop];
+    //         return `${prop}='${val}'`;
+    //     });
+    //     let children = this.children.map(ele => {
+    //         if (ele instanceof VNode) {
+    //             return ele.getTemplate();
+    //         } else {
+    //             return ele;
+    //         }
+    //     });
+    //     let template = `<${this.tagName} ${props.join(' ')}>\n${children.join('\n')}\n</${this.tagName}>`;
+    //     return template;
+    // }
     
-    render_performance() {
-        console.log(this.getTemplate());
-        let container = document.createElement('div');
-        container.innerHTML = this.getTemplate();
-        return container.children[0];
-    }
+    // render_performance() {
+    //     console.log(this.getTemplate());
+    //     let container = document.createElement('div');
+    //     container.innerHTML = this.getTemplate();
+    //     return container.children[0];
+    // }
 
     render() {
         const $el = document.createElement(this.tagName);

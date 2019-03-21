@@ -14,7 +14,8 @@
 // };
 
 const curry = (func) => {
-    let argLength = func.argLength || func.length;
+    let argLength = func.argLength || func.length; // 记录原始函数有多少个形参
+    console.log('argLength', argLength);
     func.args = func.args || [];
     return function callback (...args) {
         let thisArgs = func.args.concat(args);
@@ -32,7 +33,7 @@ const curry = (func) => {
 function add(a, b) {
     return a + b;
 }
-  
+
 var curried = curry(add);
 console.log(  curried(1)(2)  ); // 3
 var add = curry(function(a, b, c, d) {

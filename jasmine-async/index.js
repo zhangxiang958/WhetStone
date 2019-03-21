@@ -1,5 +1,5 @@
-const itWill = function () {
+const it = function () {
 
 }
 
-module.exports = itWill;
+module.exports = it;

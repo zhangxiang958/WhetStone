@@ -19,8 +19,8 @@ class ObserverableArray extends Array {
         super(...args);
         let observerMethods = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse'];
         let observerProto = [];
+        let origin = Array.prototype;
         observerMethods.forEach((method) => {
-            let origin = Array.prototype;
             observerProto[method] = function (...args) {
                 let result = origin[method].apply(this, args);
                 console.log(`${method}, 数据变成了 `, this);

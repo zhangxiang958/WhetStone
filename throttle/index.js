@@ -1,19 +1,19 @@
 const throttle = (func, delay = 0) => {
-    let excuted = void 0;
+    let executed = void 0;
     return function(...args) {
-        if (excuted === void 0) {
+        if (executed === void 0) {
             func.apply(this, args);
-            excuted = +new Date();
+            executed = +new Date();
         } else {
             let now = +new Date();
-            if (now - excuted > delay) {
+            if (now - executed > delay) {
                 func.apply(this, args);
-                excuted = now;
+                executed = now;
             } else {
                 clearTimeout(func.timer);
                 func.timer = setTimeout(() => {
                     func.apply(this, args);
-                    excuted = now;
+                    executed = +new Date();
                 }, delay);
             }
         }

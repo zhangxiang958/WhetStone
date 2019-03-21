@@ -11,6 +11,9 @@ const queryString = function (url) {
     let [address, query] = url.split('?');
     if (!query) return {};
     query = query.replace(/\#.*/, '');
+    query.match(/\?[^#]+/);
+    if (!query) return {};
+    query = query[0].substr(1).split('&');
     let queryMap = query.split('&');
     let result = {};
     let existKeys = [];
