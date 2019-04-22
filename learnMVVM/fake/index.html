@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <input type="text" v-model="someStr" />
+        <input type="text" v-model="child.someStr" />
+        <!-- <p v-class="className" class="abc">
+            {{someStr}}
+            <span v-text="child.someStr"></span>
+        </p> -->
+        <p>{{ getHelloWord }}</p>
+        <p>{{ testSet }}</p>
+        <p v-html="htmlStr"></p>
+        <button v-on:click="clickBtn">change model</button>
+    </div>
+    <script src="./watcher.js"></script>
+    <script src="./observe.js"></script>
+    <script src="./compiler.js"></script>
+    <script>
+        // window.someStr = 'test';
+        // window.child = {
+        //     someStr: 'child'
+        // };
+        // window.getHelloWord = 'hello';
+        // window.htmlStr = '???';
+        // window.methods = {
+        //     clickBtn: function(e) {
+        //         var randomStrArr = ['childOne', 'childTwo', 'childThree'];
+        //         this.child.someStr = randomStrArr[parseInt(Math.random() * 3)];
+        //     }
+        // }
+        // new Compiler('#app', window);
+    </script>
+    <script>
+        let data = {
+            test: '123',
+            name: 'shawn',
+            someStr: 'fuck',
+            child: {
+                name: 'child',
+                someStr: 'someStr child',
+                son: {
+                    age: 18,
+                    hobbit: [{
+                        name: 'ball'
+                    }, {
+                        name: 'code'
+                    }]
+                }
+            },
+            getHelloWord: 'hi',
+            list: [1,2,3],
+            methods: {
+                clickBtn: function(e) {
+                    var randomStrArr = ['childOne', 'childTwo', 'childThree'];
+                    this.child.someStr = randomStrArr[parseInt(Math.random() * 3)];
+                }
+            }
+        };
+        data.loop = data;
+
+        class VM {
+            constructor (opts) {
+                this.opts = opts;
+                this.data = opts.data || {};
+                this.el = opts.el;
+                let vm = new Observer(this.data);
+
+                Object.keys(vm.data).forEach(key => {
+                    this._proxyData.call(vm, key);
+                });
+
+                new Compiler(this.el, vm);
+            }
+
+            _proxyData (key, setter, getter) {
+                let self = this;
+                setter = setter || Object.defineProperty(self, key, {
+                    enumerable: true,
+                    configurable: false,
+                    get () {
+                        return self.data[key];
+                    },
+                    set (newVal) {
+                        self.data[key] = newVal;
+                    }
+                });
+            }
+
+            static set (target, key, value) {
+                console.log(target, key, value);
+                
+            }
+
+            static delete (target, key) {
+                console.log(target, key);
+            }
+        }
+
+        new VM({
+            data,
+            el: '#app',
+            methods: {
+                clickBtn: function(e) {
+                    var randomStrArr = ['childOne', 'childTwo', 'childThree'];
+                    this.child.someStr = randomStrArr[parseInt(Math.random() * 3)];
+                }
+            }
+        });
+
+        // new Watcher(vm, 'test', (value) => {
+        //     console.log('test newValue is', value);
+        // });
+
+        // new Watcher(vm, 'child.name', (value) => {
+        //     console.log('child.name newValue is', value);
+        // });
+
+        // new Watcher(vm, 'child.son.age', (value) => {
+        //     console.log('child.son.age newValue is', value);
+        // });
+
+        // new Watcher(vm, 'list', (value) => {
+        //     console.log('list newValue is', value);
+        // });
+
+        // vm.data.test = 123;
+        // vm.data.child.name = 'test child';
+        // vm.data.child.son.age = 19;
+        data.test = 123;
+        data.child.name = 'test child';
+        data.child.son.age = 19;
+        data.list.push(4);
+        data.list.splice(3, 1, 5);
+        VM.set(data, 'testSet', 1);
+        VM.delete(data, 'getHelloWord');
+    </script>
+</body>
+</html>
