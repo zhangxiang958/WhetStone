@@ -1,10 +1,11 @@
 class Watcher {
-    constructor (vm, expOrFn, cb) {
+    constructor (vm, expOrFn, cb, opts) {
         this.vm = vm;
         this.deps = [];
         this.depIds = new Set();
         this.expOrFn = expOrFn;
         this.cb = cb;
+        this.opts = opts;
 
         if (typeof this.expOrFn === 'function') {
             this.getter = this.expOrFn;

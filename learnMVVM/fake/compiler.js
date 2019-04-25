@@ -17,7 +17,7 @@ const Directives = {
         new Watcher(vm, exp, (value) => {
             updater && updater(node, this._getVMValue(vm, exp));
         });
-        
+
         node.addEventListener('input', (e) => {
             let newValue = e.target.value;
             let oldValue = this._getVMValue(vm, exp);
@@ -72,7 +72,8 @@ const Updater = {
 
     eventHandler (node, vm, exp, directive) {
         let [on, eventType] = directive.split(':');
-        let handler = vm.methods[exp];
+        let methods = vm.opts.methods;
+        let handler = methods[exp];
         if (eventType && handler) {
             node.addEventListener(eventType, (e) => {
                 handler.call(vm, e);
@@ -84,6 +85,7 @@ const Updater = {
 class Compiler {
     constructor (el, vm) {
         this.vm = vm;
+        this.data = vm._data;
         this.$el = this.isElementNode(el) ? el : document.querySelector(el);
         this.$fragment = this.node2Fragment(this.$el);
         this.init();
@@ -121,7 +123,7 @@ class Compiler {
                 if (this.isEventDirective(directive)) {
                     Updater.eventHandler(node, this.vm, value, directive);
                 } else {
-                    Directives[directive] && Directives[directive](node, this.vm, value);
+                    Directives[directive] && Directives[directive](node, this.data, value);
                 }
 
                 node.removeAttribute(key);
@@ -130,7 +132,7 @@ class Compiler {
     }
 
     compileText (node, exp) {
-        Directives['text'] && Directives['text'](node, this.vm, exp);
+        Directives['text'] && Directives['text'](node, this.data, exp);
     }
 
     node2Fragment (el) {
